@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>술 리뷰 기록</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <style>
+    :root {
+      --bg: #0f1218;
+      --surface: #1a1f2a;
+      --surface-hover: #232a38;
+      --border: #2e3648;
+      --text: #e8eaef;
+      --muted: #8b93a8;
+      --accent: #c9a227;
+      --accent-dim: #8a7020;
+      --star: #f4c430;
+      --danger: #c94c4c;
+      --radius: 10px;
+      --font: Pretendard, "Pretendard Variable", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+      font-size: 16px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .wrap {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 1.5rem 1.25rem 3rem;
+    }
+
+    header {
+      margin-bottom: 2rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1.25rem;
+    }
+
+    header h1 {
+      margin: 0 0 0.35rem;
+      font-size: 1.65rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    header p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.35rem;
+      margin-bottom: 1.25rem;
+    }
+
+    section h2 {
+      margin: 0 0 1rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+    }
+
+    .type-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.5rem;
+    }
+
+    @media (max-width: 380px) {
+      .type-btn {
+        min-height: 5rem;
+        padding: 0.45rem 0.2rem;
+        gap: 0.3rem;
+      }
+
+      .type-btn__icon {
+        width: 1.95rem;
+        height: 1.95rem;
+      }
+
+      .type-btn__label {
+        font-size: 0.72rem;
+      }
+    }
+
+    .type-btn {
+      font-family: inherit;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      min-height: 5.5rem;
+      padding: 0.55rem 0.35rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s, color 0.15s, box-shadow 0.15s;
+    }
+
+    .type-btn:hover {
+      background: var(--surface-hover);
+      border-color: var(--muted);
+    }
+
+    .type-btn[aria-pressed="true"] {
+      background: rgba(201, 162, 39, 0.16);
+      border-color: var(--accent);
+      color: var(--accent);
+      box-shadow: inset 0 0 0 1px rgba(201, 162, 39, 0.35);
+    }
+
+    .type-btn__icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.25rem;
+      height: 2.25rem;
+      color: var(--muted);
+      transition: color 0.15s;
+    }
+
+    .type-btn__icon svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .type-btn:hover .type-btn__icon {
+      color: var(--text);
+    }
+
+    .type-btn[aria-pressed="true"] .type-btn__icon {
+      color: var(--accent);
+    }
+
+    .type-btn__label {
+      font-size: 0.8125rem;
+      font-weight: 600;
+      line-height: 1.25;
+      text-align: center;
+      letter-spacing: -0.02em;
+    }
+
+    .field {
+      margin-bottom: 1rem;
+    }
+
+    .field:last-of-type {
+      margin-bottom: 0;
+    }
+
+    label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--muted);
+      margin-bottom: 0.35rem;
+    }
+
+    input[type="text"],
+    textarea {
+      width: 100%;
+      font-family: inherit;
+      font-size: 1rem;
+      padding: 0.65rem 0.75rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    input[type="text"]:focus,
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(201, 162, 39, 0.2);
+    }
+
+    textarea {
+      min-height: 4.5rem;
+      resize: vertical;
+    }
+
+    .optional-hint {
+      font-weight: 400;
+      color: var(--muted);
+    }
+
+    .stars {
+      display: flex;
+      gap: 0.25rem;
+      align-items: center;
+    }
+
+    .star-btn {
+      font-size: 1.75rem;
+      line-height: 1;
+      padding: 0.15rem;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      color: var(--border);
+      transition: color 0.15s, transform 0.1s;
+    }
+
+    .star-btn:hover {
+      transform: scale(1.08);
+    }
+
+    .star-btn.on {
+      color: var(--star);
+    }
+
+    .star-label {
+      margin-left: 0.5rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .tag-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+    }
+
+    .tag-btn {
+      font-family: inherit;
+      font-size: 0.8rem;
+      padding: 0.4rem 0.7rem;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .tag-btn:hover {
+      border-color: var(--muted);
+      color: var(--text);
+    }
+
+    .tag-btn[aria-pressed="true"] {
+      background: rgba(201, 162, 39, 0.15);
+      border-color: var(--accent-dim);
+      color: var(--accent);
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 0.6rem;
+      margin-top: 1.25rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 600;
+      padding: 0.65rem 1.25rem;
+      border: none;
+      border-radius: 8px;
+      background: var(--accent);
+      color: #1a1508;
+      cursor: pointer;
+      transition: filter 0.15s, transform 0.1s;
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.08);
+    }
+
+    .btn-primary:active {
+      transform: scale(0.98);
+    }
+
+    .btn-ghost {
+      font-family: inherit;
+      font-size: 0.9rem;
+      padding: 0.65rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+    }
+
+    .btn-ghost:hover {
+      color: var(--text);
+      border-color: var(--muted);
+    }
+
+    .filter-row {
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+
+    @media (min-width: 540px) {
+      .filter-row {
+        flex-direction: row;
+        align-items: flex-end;
+        flex-wrap: wrap;
+      }
+    }
+
+    .filter-field {
+      flex: 1;
+      min-width: 140px;
+    }
+
+    .filter-field select {
+      width: 100%;
+      font-family: inherit;
+      font-size: 0.9rem;
+      padding: 0.55rem 0.65rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .filter-tags {
+      width: 100%;
+    }
+
+    .filter-tags .tag-grid {
+      margin-top: 0.35rem;
+    }
+
+    .list-meta {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 1rem;
+    }
+
+    .empty {
+      text-align: center;
+      padding: 2rem 1rem;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .card {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 1.1rem;
+      margin-bottom: 0.75rem;
+      background: var(--bg);
+    }
+
+    .card:last-child {
+      margin-bottom: 0;
+    }
+
+    .card-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.75rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .card-title {
+      font-weight: 600;
+      font-size: 1.05rem;
+      margin: 0;
+    }
+
+    .card-type {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--accent);
+      margin-top: 0.2rem;
+    }
+
+    .card-stars {
+      color: var(--star);
+      font-size: 0.95rem;
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+    }
+
+    .card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      margin: 0.5rem 0;
+    }
+
+    .card-tag {
+      font-size: 0.72rem;
+      padding: 0.2rem 0.45rem;
+      border-radius: 4px;
+      background: var(--surface-hover);
+      color: var(--muted);
+    }
+
+    .card-comment {
+      margin: 0;
+      font-size: 0.92rem;
+      color: var(--text);
+    }
+
+    .card-place {
+      margin: 0.5rem 0 0;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    .card-foot {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 0.75rem;
+      padding-top: 0.65rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .card-date {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .btn-delete {
+      font-family: inherit;
+      font-size: 0.75rem;
+      padding: 0.3rem 0.55rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: transparent;
+      color: var(--danger);
+      cursor: pointer;
+    }
+
+    .btn-delete:hover {
+      border-color: var(--danger);
+      background: rgba(201, 76, 76, 0.1);
+    }
+
+    .error-msg {
+      font-size: 0.85rem;
+      color: var(--danger);
+      margin-top: 0.5rem;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .photo-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .photo-preview-wrap {
+      margin-top: 0.35rem;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      max-width: 100%;
+    }
+
+    .photo-preview-wrap[hidden] {
+      display: none !important;
+    }
+
+    .photo-preview-wrap img {
+      display: block;
+      width: 100%;
+      max-height: 220px;
+      object-fit: cover;
+    }
+
+    .card-photo {
+      margin: 0.65rem 0 0;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .card-photo img {
+      display: block;
+      width: 100%;
+      max-height: 240px;
+      object-fit: cover;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>술 리뷰 기록</h1>
+      <p>마신 술을 간단히 남기고, 나중에 필터로 다시 찾아보세요.</p>
+    </header>
+
+    <section aria-labelledby="form-heading">
+      <h2 id="form-heading">새 리뷰</h2>
+      <div class="field">
+        <span id="type-label" style="display:block;font-size:0.8rem;font-weight:500;color:var(--muted);margin-bottom:0.35rem;">술 종류</span>
+        <div class="type-grid" id="type-buttons" role="group" aria-labelledby="type-label"></div>
+      </div>
+      <div class="field">
+        <label for="drink-name">술 이름</label>
+        <input type="text" id="drink-name" placeholder="예: 참이슬 후레쉬" autocomplete="off" />
+      </div>
+      <div class="field">
+        <span id="star-label" style="display:block;font-size:0.8rem;font-weight:500;color:var(--muted);margin-bottom:0.35rem;">별점 (5점 만점)</span>
+        <div class="stars" id="star-row" role="group" aria-labelledby="star-label"></div>
+      </div>
+      <div class="field">
+        <span id="taste-label" style="display:block;font-size:0.8rem;font-weight:500;color:var(--muted);margin-bottom:0.35rem;">맛 태그 (복수 선택)</span>
+        <div class="tag-grid" id="taste-tags" role="group" aria-labelledby="taste-label"></div>
+      </div>
+      <div class="field">
+        <label for="comment">한줄평</label>
+        <textarea id="comment" placeholder="느낌을 한 줄로 적어보세요."></textarea>
+      </div>
+      <div class="field">
+        <label for="place">장소 <span class="optional-hint">(선택)</span></label>
+        <input type="text" id="place" placeholder="예: 강남 ○○포차" autocomplete="off" />
+      </div>
+      <div class="field">
+        <span style="display:block;font-size:0.8rem;font-weight:500;color:var(--muted);margin-bottom:0.35rem;">사진 <span class="optional-hint">(선택)</span></span>
+        <input type="file" id="photo-input" class="sr-only" accept="image/*" />
+        <div class="photo-toolbar">
+          <button type="button" class="btn-ghost" id="btn-pick-photo">사진 첨부</button>
+          <button type="button" class="btn-ghost" id="btn-clear-photo" hidden>사진 제거</button>
+        </div>
+        <div id="photo-preview-wrap" class="photo-preview-wrap" hidden>
+          <img id="photo-preview-img" src="" alt="첨부 미리보기" />
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn-primary" id="btn-save">저장</button>
+        <button type="button" class="btn-ghost" id="btn-reset">폼 초기화</button>
+      </div>
+      <p class="error-msg" id="form-error" hidden></p>
+    </section>
+
+    <section aria-labelledby="filter-heading">
+      <h2 id="filter-heading">필터</h2>
+      <div class="filter-row">
+        <div class="filter-field">
+          <label for="filter-type">종류</label>
+          <select id="filter-type"></select>
+        </div>
+        <div class="filter-field">
+          <label for="filter-rating">최소 별점</label>
+          <select id="filter-rating">
+            <option value="0">전체</option>
+            <option value="1">★1 이상</option>
+            <option value="2">★2 이상</option>
+            <option value="3">★3 이상</option>
+            <option value="4">★4 이상</option>
+            <option value="5">★5만</option>
+          </select>
+        </div>
+        <div class="filter-field" style="flex:2;min-width:200px;">
+          <label for="filter-search">검색 (이름·한줄평·장소)</label>
+          <input type="text" id="filter-search" placeholder="검색어" />
+        </div>
+      </div>
+      <div class="filter-tags field" style="margin-top:0.85rem;margin-bottom:0;">
+        <span style="display:block;font-size:0.8rem;font-weight:500;color:var(--muted);margin-bottom:0.35rem;">태그로 필터 (선택한 태그를 모두 포함)</span>
+        <div class="tag-grid" id="filter-tag-buttons" role="group"></div>
+      </div>
+    </section>
+
+    <section aria-labelledby="list-heading">
+      <h2 id="list-heading">리뷰 목록</h2>
+      <p class="list-meta" id="list-meta"></p>
+      <div id="review-list"></div>
+    </section>
+  </div>
+
+  <script>
+    (function () {
+      var STORAGE_KEY = "drinkReviewApp_v1";
+
+      var DRINK_TYPES = [
+        "소주",
+        "맥주",
+        "와인",
+        "위스키",
+        "사케",
+        "중국술",
+        "막걸리",
+        "기타",
+      ];
+
+      var DRINK_TYPE_ICONS = {
+        소주:
+          '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M9 2.5h6v2.2L13.2 7v13.2a2.2 2.2 0 0 1-2.2 2.2v0a2.2 2.2 0 0 1-2.2-2.2V7L9 4.7V2.5Z" stroke="currentColor" stroke-width="1.65" stroke-linejoin="round"/><path d="M9.8 10.2h4.4" stroke="currentColor" stroke-width="1.65" stroke-linecap="round"/><path d="M10.5 2.5V1.2h3V2.5" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+        맥주:
+          '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M6.2 7.5h9.1l-.9 10.4a2 2 0 0 1-2 1.8H9.1a2 2 0 0 1-2-1.8L6.2 7.5Z" stroke="currentColor" stroke-width="1.65" stroke-linejoin="round"/><path d="M5.5 9.2h10.8M8 7.5V5.2M13.8 7.5V5.2" stroke="currentColor" stroke-width="1.65" stroke-linecap="round"/><path d="M15.3 9.5h2.2a2.4 2.4 0 0 1 0 4.8h-2" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.2 8.8c.6 1.4 1.8 2 3.8 2s3.2-.6 3.8-2" stroke="currentColor" stroke-width="1.35" stroke-linecap="round"/></svg>',
+        와인:
+          '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 2.2v6.8c0 2.1-2.8 3.8-2.8 5.6h5.6c0-1.8-2.8-3.5-2.8-5.6V2.2" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.2 14.6h5.6v1.4a3.4 3.4 0 1 1-5.6 0v-1.4Z" stroke="currentColor" stroke-width="1.65" stroke-linejoin="round"/></svg>',
+        위스키:
+          '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M8.2 5.5h7.6L15 19.2H9L8.2 5.5Z" stroke="currentColor" stroke-width="1.65" stroke-linejoin="round"/><path d="M7.5 8h9M9 5.5V4h6v1.5" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 12h4" stroke="currentColor" stroke-width="1.35" stroke-linecap="round"/></svg>',
+        사케:
+          '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><ellipse cx="12" cy="4.8" rx="3.2" ry="1.3" stroke="currentColor" stroke-width="1.65"/><path d="M8.8 5.4c0 7.8.2 10.2 1.6 12.4h3.2c1.4-2.2 1.6-4.6 1.6-12.4" stroke="currentColor" stroke-width="1.65" stroke-linejoin="round"/><path d="M10.2 17.8h3.6v2.4a1.8 1.8 0 0 1-3.6 0v-2.4Z" stroke="currentColor" stroke-width="1.65" stroke-linejoin="round"/></svg>',
+        중국술:
+          '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M9.5 3.5h5l1.4 2.2v13.4a2.2 2.2 0 0 1-2.2 2.2h-3.4a2.2 2.2 0 0 1-2.2-2.2V5.7l1.4-2.2Z" stroke="currentColor" stroke-width="1.65" stroke-linejoin="round"/><path d="M9 3.5V2.2h6v1.3" stroke="currentColor" stroke-width="1.65" stroke-linecap="round"/><path d="M10.2 8.8h3.6M10.2 12.2h3.6" stroke="currentColor" stroke-width="1.35" stroke-linecap="round"/></svg>',
+        막걸리:
+          '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M4.5 10.2c2.2 6.2 4.8 8.8 7.5 8.8s5.3-2.6 7.5-8.8" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"/><path d="M3.8 9.5h16.4" stroke="currentColor" stroke-width="1.65" stroke-linecap="round"/><ellipse cx="12" cy="9.3" rx="8.2" ry="2.2" stroke="currentColor" stroke-width="1.65"/></svg>',
+        기타:
+          '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M8.5 5.2V3.2M12 6.8V2.5M15.5 5.2V3.2" stroke="currentColor" stroke-width="1.65" stroke-linecap="round"/><path d="M7.2 7.4h1.8l-.4 11.4a1.6 1.6 0 0 0 1.6 1.7h3.6a1.6 1.6 0 0 0 1.6-1.7L15 7.4h1.8" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.2 7.4h5.6" stroke="currentColor" stroke-width="1.65" stroke-linecap="round"/><circle cx="8" cy="17" r="1.35" stroke="currentColor" stroke-width="1.4"/><circle cx="16" cy="17" r="1.35" stroke="currentColor" stroke-width="1.4"/></svg>',
+      };
+
+      var TASTE_TAGS = [
+        "단맛-진한",
+        "단맛-은은",
+        "산미",
+        "쓴맛",
+        "프루티",
+        "스모키",
+        "드라이",
+        "묵직",
+        "가벼운",
+        "부드러운",
+      ];
+
+      var state = {
+        reviews: [],
+        selectedType: "",
+        rating: 0,
+        selectedTags: [],
+        pendingPhoto: "",
+        filterType: "",
+        filterMinRating: 0,
+        filterSearch: "",
+        filterTags: [],
+      };
+
+      function loadReviews() {
+        try {
+          var raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) return [];
+          var parsed = JSON.parse(raw);
+          return Array.isArray(parsed) ? parsed : [];
+        } catch (e) {
+          return [];
+        }
+      }
+
+      function saveReviews() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state.reviews));
+      }
+
+      function uid() {
+        return "r_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2, 9);
+      }
+
+      var el = {
+        typeButtons: document.getElementById("type-buttons"),
+        drinkName: document.getElementById("drink-name"),
+        starRow: document.getElementById("star-row"),
+        tasteTags: document.getElementById("taste-tags"),
+        comment: document.getElementById("comment"),
+        place: document.getElementById("place"),
+        photoInput: document.getElementById("photo-input"),
+        btnPickPhoto: document.getElementById("btn-pick-photo"),
+        btnClearPhoto: document.getElementById("btn-clear-photo"),
+        photoPreviewWrap: document.getElementById("photo-preview-wrap"),
+        photoPreviewImg: document.getElementById("photo-preview-img"),
+        btnSave: document.getElementById("btn-save"),
+        btnReset: document.getElementById("btn-reset"),
+        formError: document.getElementById("form-error"),
+        filterType: document.getElementById("filter-type"),
+        filterRating: document.getElementById("filter-rating"),
+        filterSearch: document.getElementById("filter-search"),
+        filterTagButtons: document.getElementById("filter-tag-buttons"),
+        reviewList: document.getElementById("review-list"),
+        listMeta: document.getElementById("list-meta"),
+      };
+
+      function compressImageFile(file, done) {
+        if (!file || !/^image\//.test(file.type)) {
+          done("이미지 파일만 첨부할 수 있습니다.");
+          return;
+        }
+        if (file.size > 14 * 1024 * 1024) {
+          done("파일이 너무 큽니다. 14MB 이하로 올려 주세요.");
+          return;
+        }
+        var reader = new FileReader();
+        reader.onload = function (ev) {
+          var img = new Image();
+          img.onload = function () {
+            var maxSide = 960;
+            var w = img.width;
+            var h = img.height;
+            var scale = Math.min(maxSide / w, maxSide / h, 1);
+            var cw = Math.max(1, Math.round(w * scale));
+            var ch = Math.max(1, Math.round(h * scale));
+            var canvas = document.createElement("canvas");
+            canvas.width = cw;
+            canvas.height = ch;
+            var ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0, cw, ch);
+            function tryExport(q) {
+              var dataUrl;
+              try {
+                dataUrl = canvas.toDataURL("image/jpeg", q);
+              } catch (err) {
+                done("이 형식은 이 브라우저에서 저장할 수 없습니다.");
+                return;
+              }
+              if (dataUrl.length > 1900000 && q > 0.42) {
+                tryExport(Math.max(0.42, q - 0.14));
+              } else {
+                done(null, dataUrl);
+              }
+            }
+            tryExport(0.82);
+          };
+          img.onerror = function () {
+            done("이미지를 불러오지 못했습니다.");
+          };
+          img.src = ev.target.result;
+        };
+        reader.onerror = function () {
+          done("파일을 읽지 못했습니다.");
+        };
+        reader.readAsDataURL(file);
+      }
+
+      function syncPhotoPreview() {
+        if (state.pendingPhoto) {
+          el.photoPreviewImg.src = state.pendingPhoto;
+          el.photoPreviewWrap.hidden = false;
+          el.btnClearPhoto.hidden = false;
+        } else {
+          el.photoPreviewImg.removeAttribute("src");
+          el.photoPreviewWrap.hidden = true;
+          el.btnClearPhoto.hidden = true;
+        }
+      }
+
+      function clearPendingPhoto() {
+        state.pendingPhoto = "";
+        el.photoInput.value = "";
+        syncPhotoPreview();
+      }
+
+      function buildTypeButtons() {
+        el.typeButtons.innerHTML = "";
+        DRINK_TYPES.forEach(function (t) {
+          var b = document.createElement("button");
+          b.type = "button";
+          b.className = "type-btn";
+          b.setAttribute("aria-pressed", "false");
+          b.dataset.type = t;
+          b.setAttribute("aria-label", t);
+
+          var iconWrap = document.createElement("span");
+          iconWrap.className = "type-btn__icon";
+          iconWrap.innerHTML = DRINK_TYPE_ICONS[t] || "";
+
+          var lab = document.createElement("span");
+          lab.className = "type-btn__label";
+          lab.textContent = t;
+
+          b.appendChild(iconWrap);
+          b.appendChild(lab);
+
+          b.addEventListener("click", function () {
+            state.selectedType = state.selectedType === t ? "" : t;
+            syncTypeButtons();
+          });
+          el.typeButtons.appendChild(b);
+        });
+      }
+
+      function syncTypeButtons() {
+        el.typeButtons.querySelectorAll(".type-btn").forEach(function (b) {
+          b.setAttribute("aria-pressed", b.dataset.type === state.selectedType ? "true" : "false");
+        });
+      }
+
+      function buildStars() {
+        el.starRow.innerHTML = "";
+        for (var i = 1; i <= 5; i++) {
+          (function (n) {
+            var b = document.createElement("button");
+            b.type = "button";
+            b.className = "star-btn";
+            b.setAttribute("aria-label", n + "점");
+            b.textContent = "★";
+            b.dataset.value = String(n);
+            b.addEventListener("click", function () {
+              state.rating = state.rating === n ? 0 : n;
+              syncStars();
+            });
+            el.starRow.appendChild(b);
+          })(i);
+        }
+        var span = document.createElement("span");
+        span.className = "star-label";
+        span.id = "star-value-text";
+        el.starRow.appendChild(span);
+        syncStars();
+      }
+
+      function syncStars() {
+        var buttons = el.starRow.querySelectorAll(".star-btn");
+        buttons.forEach(function (b) {
+          var n = parseInt(b.dataset.value, 10);
+          b.classList.toggle("on", n <= state.rating);
+        });
+        var text = el.starRow.querySelector("#star-value-text");
+        if (text) {
+          text.textContent = state.rating ? state.rating + "점" : "선택 안 함";
+        }
+      }
+
+      function buildTasteTags() {
+        el.tasteTags.innerHTML = "";
+        TASTE_TAGS.forEach(function (tag) {
+          var b = document.createElement("button");
+          b.type = "button";
+          b.className = "tag-btn";
+          b.textContent = tag;
+          b.setAttribute("aria-pressed", "false");
+          b.dataset.tag = tag;
+          b.addEventListener("click", function () {
+            var idx = state.selectedTags.indexOf(tag);
+            if (idx >= 0) state.selectedTags.splice(idx, 1);
+            else state.selectedTags.push(tag);
+            syncTasteTags();
+          });
+          el.tasteTags.appendChild(b);
+        });
+      }
+
+      function syncTasteTags() {
+        el.tasteTags.querySelectorAll(".tag-btn").forEach(function (b) {
+          var on = state.selectedTags.indexOf(b.dataset.tag) >= 0;
+          b.setAttribute("aria-pressed", on ? "true" : "false");
+        });
+      }
+
+      function buildFilterTypeSelect() {
+        el.filterType.innerHTML = "";
+        var optAll = document.createElement("option");
+        optAll.value = "";
+        optAll.textContent = "전체 종류";
+        el.filterType.appendChild(optAll);
+        DRINK_TYPES.forEach(function (t) {
+          var o = document.createElement("option");
+          o.value = t;
+          o.textContent = t;
+          el.filterType.appendChild(o);
+        });
+      }
+
+      function buildFilterTags() {
+        el.filterTagButtons.innerHTML = "";
+        TASTE_TAGS.forEach(function (tag) {
+          var b = document.createElement("button");
+          b.type = "button";
+          b.className = "tag-btn";
+          b.textContent = tag;
+          b.setAttribute("aria-pressed", "false");
+          b.dataset.ftag = tag;
+          b.addEventListener("click", function () {
+            var idx = state.filterTags.indexOf(tag);
+            if (idx >= 0) state.filterTags.splice(idx, 1);
+            else state.filterTags.push(tag);
+            syncFilterTags();
+            renderList();
+          });
+          el.filterTagButtons.appendChild(b);
+        });
+      }
+
+      function syncFilterTags() {
+        el.filterTagButtons.querySelectorAll(".tag-btn").forEach(function (b) {
+          var on = state.filterTags.indexOf(b.dataset.ftag) >= 0;
+          b.setAttribute("aria-pressed", on ? "true" : "false");
+        });
+      }
+
+      function showError(msg) {
+        if (msg) {
+          el.formError.textContent = msg;
+          el.formError.hidden = false;
+        } else {
+          el.formError.hidden = true;
+          el.formError.textContent = "";
+        }
+      }
+
+      function resetForm() {
+        state.selectedType = "";
+        state.rating = 0;
+        state.selectedTags = [];
+        el.drinkName.value = "";
+        el.comment.value = "";
+        el.place.value = "";
+        clearPendingPhoto();
+        syncTypeButtons();
+        syncStars();
+        syncTasteTags();
+        showError("");
+      }
+
+      function filteredReviews() {
+        var minR = state.filterMinRating;
+        var type = state.filterType;
+        var q = state.filterSearch.trim().toLowerCase();
+        var needTags = state.filterTags;
+
+        return state.reviews.filter(function (r) {
+          if (type && r.type !== type) return false;
+          if (minR > 0 && r.rating < minR) return false;
+          if (q) {
+            var hay = (r.name + " " + (r.comment || "") + " " + (r.place || "")).toLowerCase();
+            if (hay.indexOf(q) === -1) return false;
+          }
+          if (needTags.length) {
+            var tags = r.tags || [];
+            for (var i = 0; i < needTags.length; i++) {
+              if (tags.indexOf(needTags[i]) === -1) return false;
+            }
+          }
+          return true;
+        });
+      }
+
+      function formatDate(iso) {
+        if (!iso) return "";
+        try {
+          var d = new Date(iso);
+          return d.toLocaleString("ko-KR", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+        } catch (e) {
+          return iso;
+        }
+      }
+
+      function renderList() {
+        var items = filteredReviews();
+        items.sort(function (a, b) {
+          return new Date(b.createdAt) - new Date(a.createdAt);
+        });
+
+        el.listMeta.textContent =
+          items.length === state.reviews.length
+            ? "총 " + state.reviews.length + "건"
+            : "표시 " + items.length + "건 / 전체 " + state.reviews.length + "건";
+
+        if (!items.length) {
+          el.reviewList.innerHTML =
+            '<p class="empty">' +
+            (state.reviews.length ? "조건에 맞는 리뷰가 없습니다." : "아직 리뷰가 없습니다. 위에서 첫 기록을 남겨보세요.") +
+            "</p>";
+          return;
+        }
+
+        el.reviewList.innerHTML = "";
+        items.forEach(function (r) {
+          var card = document.createElement("article");
+          card.className = "card";
+
+          var head = document.createElement("div");
+          head.className = "card-head";
+          var left = document.createElement("div");
+          var h3 = document.createElement("h3");
+          h3.className = "card-title";
+          h3.textContent = r.name || "(이름 없음)";
+          var typeSpan = document.createElement("span");
+          typeSpan.className = "card-type";
+          typeSpan.textContent = r.type || "미분류";
+          left.appendChild(h3);
+          left.appendChild(typeSpan);
+          var stars = document.createElement("div");
+          stars.className = "card-stars";
+          stars.setAttribute("aria-label", r.rating + "점");
+          stars.textContent = "★".repeat(r.rating) + "☆".repeat(5 - r.rating);
+          head.appendChild(left);
+          head.appendChild(stars);
+          card.appendChild(head);
+
+          if (r.tags && r.tags.length) {
+            var tagRow = document.createElement("div");
+            tagRow.className = "card-tags";
+            r.tags.forEach(function (t) {
+              var s = document.createElement("span");
+              s.className = "card-tag";
+              s.textContent = t;
+              tagRow.appendChild(s);
+            });
+            card.appendChild(tagRow);
+          }
+
+          var p = document.createElement("p");
+          p.className = "card-comment";
+          p.textContent = r.comment || "(한줄평 없음)";
+          card.appendChild(p);
+
+          if (r.photo) {
+            var ph = document.createElement("div");
+            ph.className = "card-photo";
+            var phImg = document.createElement("img");
+            phImg.src = r.photo;
+            phImg.alt = (r.name || "리뷰") + " 첨부 사진";
+            phImg.loading = "lazy";
+            ph.appendChild(phImg);
+            card.appendChild(ph);
+          }
+
+          if (r.place) {
+            var pl = document.createElement("p");
+            pl.className = "card-place";
+            pl.textContent = "📍 " + r.place;
+            card.appendChild(pl);
+          }
+
+          var foot = document.createElement("div");
+          foot.className = "card-foot";
+          var dateEl = document.createElement("span");
+          dateEl.className = "card-date";
+          dateEl.textContent = formatDate(r.createdAt);
+          var del = document.createElement("button");
+          del.type = "button";
+          del.className = "btn-delete";
+          del.textContent = "삭제";
+          del.addEventListener("click", function () {
+            if (!confirm("이 리뷰를 삭제할까요?")) return;
+            state.reviews = state.reviews.filter(function (x) {
+              return x.id !== r.id;
+            });
+            saveReviews();
+            renderList();
+          });
+          foot.appendChild(dateEl);
+          foot.appendChild(del);
+          card.appendChild(foot);
+
+          el.reviewList.appendChild(card);
+        });
+      }
+
+      el.btnSave.addEventListener("click", function () {
+        showError("");
+        var name = el.drinkName.value.trim();
+        if (!state.selectedType) {
+          showError("술 종류를 선택해 주세요.");
+          return;
+        }
+        if (!name) {
+          showError("술 이름을 입력해 주세요.");
+          return;
+        }
+        if (!state.rating) {
+          showError("별점을 선택해 주세요.");
+          return;
+        }
+        var comment = el.comment.value.trim();
+        if (!comment) {
+          showError("한줄평을 입력해 주세요.");
+          return;
+        }
+
+        var review = {
+          id: uid(),
+          type: state.selectedType,
+          name: name,
+          rating: state.rating,
+          tags: state.selectedTags.slice().sort(),
+          comment: comment,
+          place: el.place.value.trim() || "",
+          photo: state.pendingPhoto || "",
+          createdAt: new Date().toISOString(),
+        };
+        state.reviews.push(review);
+        saveReviews();
+        resetForm();
+        renderList();
+      });
+
+      el.btnReset.addEventListener("click", resetForm);
+
+      el.btnPickPhoto.addEventListener("click", function () {
+        el.photoInput.click();
+      });
+
+      el.btnClearPhoto.addEventListener("click", function () {
+        clearPendingPhoto();
+      });
+
+      el.photoInput.addEventListener("change", function () {
+        var f = el.photoInput.files && el.photoInput.files[0];
+        if (!f) return;
+        compressImageFile(f, function (err, dataUrl) {
+          if (err) {
+            showError(err);
+            el.photoInput.value = "";
+            return;
+          }
+          showError("");
+          state.pendingPhoto = dataUrl;
+          syncPhotoPreview();
+        });
+      });
+
+      el.filterType.addEventListener("change", function () {
+        state.filterType = el.filterType.value;
+        renderList();
+      });
+
+      el.filterRating.addEventListener("change", function () {
+        state.filterMinRating = parseInt(el.filterRating.value, 10) || 0;
+        renderList();
+      });
+
+      var searchTimer;
+      el.filterSearch.addEventListener("input", function () {
+        state.filterSearch = el.filterSearch.value;
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(renderList, 200);
+      });
+
+      state.reviews = loadReviews();
+      syncPhotoPreview();
+      buildTypeButtons();
+      buildStars();
+      buildTasteTags();
+      buildFilterTypeSelect();
+      buildFilterTags();
+      renderList();
+    })();
+  </script>
+</body>
+</html>
